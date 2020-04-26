@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
@@ -20,10 +21,14 @@ func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	u := url.URL{Scheme: "ws", Host: *addr, Path: "/echo"}
+	u := url.URL{Scheme: "ws", Host: *addr, Path: "/restricted/ws"}
 	log.Printf("connecting to %s", u.String())
 
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	var reqH http.Header
+	reqH = make(map[string][]string)
+	reqH.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTg4MTUxNzE4LCJuYW1lIjoiSm9uIFNub3cifQ.teFe2gRpQ5i_Z6DrPZUUa2loVKdXT_l0UYpigblMLe0")
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), reqH)
 	if err != nil {
 		log.Fatal("dial:", err)
 	}

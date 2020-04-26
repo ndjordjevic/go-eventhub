@@ -52,9 +52,13 @@ github.com/gobwas/pool v0.2.0/go.mod h1:q8bcK0KcYlCgd9e7WYLm9LpyS+YeLd8JVDW6Wezm
 github.com/gobwas/ws v1.0.2/go.mod h1:szmBTxLgaFppYjEmNtny/v3w89xOydFnnZMcgRRu/EM=
 github.com/gobwas/ws v1.0.3 h1:ZOigqf7iBxkA4jdQ3am7ATzdlOFp9YzA6NmuvEEZc9g=
 github.com/gobwas/ws v1.0.3/go.mod h1:szmBTxLgaFppYjEmNtny/v3w89xOydFnnZMcgRRu/EM=
+github.com/gofiber/cors v0.0.3 h1:SngvHSzNHq+0sMHJtq98ZwoYDxTJbw2rgyOXNhlQfQk=
+github.com/gofiber/cors v0.0.3/go.mod h1:TQCNpj0sjdbIx1LY8umvJMak4G7l7HxOGhUPIusPPyg=
 github.com/gofiber/fiber v1.9.0/go.mod h1:yQhhFUJprqnZVaEbd5h4ZqU+wb9vzP5imw7UbjGlDuQ=
 github.com/gofiber/fiber v1.9.2 h1:r7ZkAALBZWnw85nNRXkdtemZHFXTC9lduAbGUkK4Xww=
 github.com/gofiber/fiber v1.9.2/go.mod h1:o2YQgwJW8+Z16x8MTos4nYn8PD1RJpzu9fojiGqjSjI=
+github.com/gofiber/jwt v0.0.6 h1:dQWj9FsPR5rcORrCTiadhpDerHs64onQV0bIjYqqOmg=
+github.com/gofiber/jwt v0.0.6/go.mod h1:lkJFTQxUT7gPq27oEgYrXw0Wc6mzMF7fWiX7G69ORh8=
 github.com/gofiber/websocket v0.2.0 h1:9ic/QB20LGNZe96xVs2daFWreO3orn/fZv4WizMGvSE=
 github.com/gofiber/websocket v0.2.0/go.mod h1:OQFKOq+VHvdyrN9CnPGSnctNRzQoqaNaD7l0RLKcgBY=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
