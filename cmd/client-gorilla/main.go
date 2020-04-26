@@ -26,7 +26,7 @@ func main() {
 
 	var reqH http.Header
 	reqH = make(map[string][]string)
-	reqH.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTg4MTUxNzE4LCJuYW1lIjoiSm9uIFNub3cifQ.teFe2gRpQ5i_Z6DrPZUUa2loVKdXT_l0UYpigblMLe0")
+	reqH.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTg4MTYxODk5LCJuYW1lIjoibmRqb3JkamV2aWMifQ.E3dMEI26kySWp4kVrh80D4SL17UbEFsgcMarcncdEYM")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), reqH)
 	if err != nil {

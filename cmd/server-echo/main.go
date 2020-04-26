@@ -16,6 +16,8 @@ var (
 			return true
 		},
 	}
+
+	usrConns = make(map[string]*websocket.Conn)
 )
 
 func login(c echo.Context) error {
@@ -23,7 +25,7 @@ func login(c echo.Context) error {
 	password := c.FormValue("password")
 
 	// Throws unauthorized error
-	if username != "jon" || password != "shhh!" {
+	if username != "ndjordjevic" || username != "vpopovic" || password != "test" {
 		return echo.ErrUnauthorized
 	}
 
@@ -32,7 +34,7 @@ func login(c echo.Context) error {
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = "Jon Snow"
+	claims["name"] = "ndjordjevic"
 	claims["admin"] = true
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
@@ -49,6 +51,16 @@ func login(c echo.Context) error {
 
 func hello(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	name := claims["name"].(string)
+	fmt.Println(name)
+
+	usrConns[name] = ws
+
+	fmt.Println(usrConns)
+
 	if err != nil {
 		return err
 	}
