@@ -6,7 +6,10 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/nats-io/nats.go"
+	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -68,10 +71,10 @@ func hello(c echo.Context) error {
 
 	for {
 		// Write
-		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		if err != nil {
-			c.Logger().Error(err)
-		}
+		//err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+		//if err != nil {
+		//	c.Logger().Error(err)
+		//}
 
 		// Read
 		_, msg, err := ws.ReadMessage()
@@ -112,6 +115,35 @@ func main() {
 	r.Use(middleware.JWT([]byte("secret")))
 	r.GET("", restricted)
 	r.GET("/ws", hello)
+
+	go func() {
+		nc, err := nats.Connect("localhost")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer nc.Close()
+
+		for {
+			// Subscribe
+			sub, err := nc.SubscribeSync("sb-events")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Wait for a message
+			msg, err := sub.NextMsg(100 * time.Second)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			s := strings.Split(string(msg.Data), ",")
+
+			usrConns[s[0]].WriteMessage(websocket.TextMessage, []byte(s[1]))
+
+			// Use the response
+			log.Printf("Reply: %v", s)
+		}
+	}()
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
