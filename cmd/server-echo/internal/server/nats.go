@@ -30,12 +30,12 @@ func natsListener() {
 
 		s := strings.Split(string(msg.Data), ",")
 
-		// Use the response
-		log.Printf("Forwarding to ws: %v", s)
-
-		client, _ := syncMap.Load(s[0])
-		socketMu.Lock()
-		client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(s[1]))
-		socketMu.Unlock()
+		client, ok := syncMap.Load(s[0])
+		if ok {
+			log.Printf("Forwarding to ws: %v", s)
+			socketMu.Lock()
+			client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(s[1]))
+			socketMu.Unlock()
+		}
 	}
 }
