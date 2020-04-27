@@ -20,7 +20,7 @@ func login(c echo.Context) error {
 	password := c.FormValue("password")
 
 	// Throws unauthorized error
-	if (username != "ndjordjevic" && password != "test") || (username != "vpopovic" && password != "test") {
+	if (username != "ndjordjevic" && username != "vpopovic") || password != "test" {
 		return echo.ErrUnauthorized
 	}
 

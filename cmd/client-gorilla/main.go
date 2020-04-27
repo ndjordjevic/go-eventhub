@@ -27,7 +27,12 @@ func main() {
 
 	r, err := http.PostForm("http://localhost:8080/login", formData)
 	var result map[string]interface{}
-	json.NewDecoder(r.Body).Decode(&result)
+	_ = json.NewDecoder(r.Body).Decode(&result)
+
+	token, ok := result["token"]
+	if ok == false {
+		log.Fatal("User is not authorized to connect to ws")
+	}
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -37,7 +42,7 @@ func main() {
 
 	var reqH http.Header
 	reqH = make(map[string][]string)
-	reqH.Add("Authorization", "Bearer "+result["token"].(string))
+	reqH.Add("Authorization", "Bearer "+token.(string))
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), reqH)
 	if err != nil {

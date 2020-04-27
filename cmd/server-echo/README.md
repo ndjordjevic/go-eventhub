@@ -1,4 +1,4 @@
-go run -race main.go // start server
+go run -race main.go
 
 go run cmd/client-gorilla/main.go -user ndjordjevic
 
