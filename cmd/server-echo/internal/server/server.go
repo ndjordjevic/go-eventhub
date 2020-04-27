@@ -1,13 +1,14 @@
 package server
 
 import (
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"sync"
 )
 
 var (
-	usrConns = make(map[string]*websocket.Conn)
+	syncMap  sync.Map
+	socketMu sync.Mutex
 )
 
 func Run() {
@@ -27,7 +28,7 @@ func Run() {
 	r := e.Group("/restricted")
 	r.Use(middleware.JWT([]byte("secret")))
 	r.GET("", restricted)
-	r.GET("/ws", hello)
+	r.GET("/ws", sbevents)
 
 	go natsListener()
 

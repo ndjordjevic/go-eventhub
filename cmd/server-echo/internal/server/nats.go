@@ -23,9 +23,9 @@ func natsListener() {
 		}
 
 		// Wait for a message
-		msg, err := sub.NextMsg(100 * time.Second)
+		msg, err := sub.NextMsg(10 * time.Second)
 		if err != nil {
-			log.Fatal(err)
+			continue
 		}
 
 		s := strings.Split(string(msg.Data), ",")
@@ -33,6 +33,9 @@ func natsListener() {
 		// Use the response
 		log.Printf("Forwarding to ws: %v", s)
 
-		usrConns[s[0]].WriteMessage(websocket.TextMessage, []byte(s[1]))
+		client, _ := syncMap.Load(s[0])
+		socketMu.Lock()
+		client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(s[1]))
+		socketMu.Unlock()
 	}
 }

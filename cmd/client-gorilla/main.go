@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/http"
@@ -13,10 +14,20 @@ import (
 )
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
+var user = flag.String("user", "ndjordjevic", "username to login to ws with")
 
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
+
+	formData := url.Values{
+		"username": {*user},
+		"password": {"test"},
+	}
+
+	r, err := http.PostForm("http://localhost:8080/login", formData)
+	var result map[string]interface{}
+	json.NewDecoder(r.Body).Decode(&result)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -26,7 +37,7 @@ func main() {
 
 	var reqH http.Header
 	reqH = make(map[string][]string)
-	reqH.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTg4MTYxODk5LCJuYW1lIjoibmRqb3JkamV2aWMifQ.E3dMEI26kySWp4kVrh80D4SL17UbEFsgcMarcncdEYM")
+	reqH.Add("Authorization", "Bearer "+result["token"].(string))
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), reqH)
 	if err != nil {

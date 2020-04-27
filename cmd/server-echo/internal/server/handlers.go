@@ -20,7 +20,7 @@ func login(c echo.Context) error {
 	password := c.FormValue("password")
 
 	// Throws unauthorized error
-	if username != "ndjordjevic" || username != "vpopovic" || password != "test" {
+	if (username != "ndjordjevic" && password != "test") || (username != "vpopovic" && password != "test") {
 		return echo.ErrUnauthorized
 	}
 
@@ -29,7 +29,7 @@ func login(c echo.Context) error {
 
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
-	claims["name"] = "ndjordjevic"
+	claims["name"] = username
 	claims["admin"] = true
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
@@ -44,17 +44,15 @@ func login(c echo.Context) error {
 	})
 }
 
-func hello(c echo.Context) error {
+func sbevents(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	name := claims["name"].(string)
-	fmt.Println(name)
+	c.Logger().Print("User logged in: ", name)
 
-	usrConns[name] = ws
-
-	fmt.Println(usrConns)
+	syncMap.Store(name, ws)
 
 	if err != nil {
 		return err
@@ -71,7 +69,11 @@ func hello(c echo.Context) error {
 		// Read
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
+			fmt.Println("Client disconnected")
 			c.Logger().Error(err)
+
+			syncMap.Delete(name)
+			return nil
 		}
 		fmt.Printf("%s\n", msg)
 	}
