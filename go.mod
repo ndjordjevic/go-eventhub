@@ -22,6 +22,7 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.6 // indirect
+	github.com/nats-io/nats.go v1.9.2
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/sergi/go-diff v1.1.0 // indirect
