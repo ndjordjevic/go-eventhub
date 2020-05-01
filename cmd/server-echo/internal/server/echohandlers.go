@@ -74,10 +74,3 @@ func wsEndpoint(c echo.Context) error {
 		fmt.Printf("%s\n", msg)
 	}
 }
-
-func restricted(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	name := claims["name"].(string)
-	return c.String(http.StatusOK, "Welcome "+name+"!")
-}

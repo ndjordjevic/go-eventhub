@@ -46,7 +46,6 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 	// Restricted group
 	r := e.Group("/restricted")
 	r.Use(middleware.JWT([]byte("secret")))
-	r.GET("", restricted)
 	r.GET("/ws", wsEndpoint)
 }
 
