@@ -1,16 +1,15 @@
 package server
 
 import (
-	"github.com/gorilla/websocket"
 	"github.com/nats-io/nats.go"
+	"go-eventhub/cmd/server-echo/internal/target"
 	"log"
 	"strings"
-	"sync"
 	"time"
 )
 
 type NATSListener struct {
-	wsClients *sync.Map
+	targets []target.Target
 }
 
 func (n *NATSListener) Listen() {
@@ -33,12 +32,10 @@ func (n *NATSListener) Listen() {
 			continue
 		}
 
-		s := strings.Split(string(msg.Data), ",")
+		parsed := strings.Split(string(msg.Data), ",")
 
-		client, ok := n.wsClients.Load(s[0])
-		if ok {
-			log.Printf("Forwarding to ws: %v", s)
-			client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(s[1]))
+		for _, target := range n.targets {
+			target.Push(parsed)
 		}
 	}
 }
