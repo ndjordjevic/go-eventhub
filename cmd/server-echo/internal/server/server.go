@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"go-eventhub/cmd/server-echo/internal/eventsource"
 	"go-eventhub/cmd/server-echo/internal/listeners"
 	"go-eventhub/cmd/server-echo/internal/mlistener"
 	"go-eventhub/cmd/server-echo/internal/pushers"
@@ -52,7 +53,7 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 func startMListener(wsClients *sync.Map) {
 	ml := mlistener.New()
 
-	ml.Add(&listeners.NATSListener{
+	ml.Add(&eventsource.NATS{
 		Targets: []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
 	})
 

@@ -1,4 +1,4 @@
-package listeners
+package eventsource
 
 import (
 	"github.com/nats-io/nats.go"
@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type NATSListener struct {
+type NATS struct {
 	Targets []pushers.EventPusher
 }
 
-func (n *NATSListener) Listen() {
+func (n *NATS) Listen() {
 	nc, err := nats.Connect("localhost")
 	if err != nil {
 		log.Fatal(err)
