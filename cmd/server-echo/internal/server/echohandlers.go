@@ -44,7 +44,7 @@ func login(c echo.Context) error {
 	})
 }
 
-func sbevents(c echo.Context) error {
+func wsEndpoint(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 
 	user := c.Get("user").(*jwt.Token)
@@ -52,7 +52,9 @@ func sbevents(c echo.Context) error {
 	name := claims["name"].(string)
 	c.Logger().Print("User logged in: ", name)
 
-	syncMap.Store(name, ws)
+	cc := c.(*CustomContext)
+	wsClients := cc.wsClients
+	wsClients.Store(name, ws)
 
 	if err != nil {
 		return err
@@ -60,19 +62,13 @@ func sbevents(c echo.Context) error {
 	defer ws.Close()
 
 	for {
-		// Write
-		//err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
-		//if err != nil {
-		//	c.Logger().Error(err)
-		//}
-
 		// Read
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
 			fmt.Println("Client disconnected")
 			c.Logger().Error(err)
 
-			syncMap.Delete(name)
+			wsClients.Delete(name)
 			return nil
 		}
 		fmt.Printf("%s\n", msg)

@@ -5,23 +5,28 @@ import (
 	"github.com/nats-io/nats.go"
 	"log"
 	"strings"
+	"sync"
 	"time"
 )
 
-func natsListener() {
+type NATSListener struct {
+	wsClients *sync.Map
+}
+
+func (n *NATSListener) Listen() {
 	nc, err := nats.Connect("localhost")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer nc.Close()
 
-	for {
-		// Subscribe
-		sub, err := nc.SubscribeSync("sb-events")
-		if err != nil {
-			log.Fatal(err)
-		}
+	// Subscribe
+	sub, err := nc.SubscribeSync("sb-events")
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	for {
 		// Wait for a message
 		msg, err := sub.NextMsg(10 * time.Second)
 		if err != nil {
@@ -30,12 +35,10 @@ func natsListener() {
 
 		s := strings.Split(string(msg.Data), ",")
 
-		client, ok := syncMap.Load(s[0])
+		client, ok := n.wsClients.Load(s[0])
 		if ok {
 			log.Printf("Forwarding to ws: %v", s)
-			socketMu.Lock()
 			client.(*websocket.Conn).WriteMessage(websocket.TextMessage, []byte(s[1]))
-			socketMu.Unlock()
 		}
 	}
 }
