@@ -1,4 +1,4 @@
-package server
+package listeners
 
 import (
 	"github.com/nats-io/nats.go"
@@ -9,7 +9,7 @@ import (
 )
 
 type NATSListener struct {
-	targets []target.Target
+	Targets []target.Target
 }
 
 func (n *NATSListener) Listen() {
@@ -34,8 +34,8 @@ func (n *NATSListener) Listen() {
 
 		parsed := strings.Split(string(msg.Data), ",")
 
-		for _, target := range n.targets {
-			target.Push(parsed)
+		for _, t := range n.targets {
+			t.Push(parsed)
 		}
 	}
 }
