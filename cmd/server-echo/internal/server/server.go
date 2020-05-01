@@ -20,7 +20,7 @@ func Run() {
 	var wsClients sync.Map
 	setupEchoServer(e, &wsClients)
 
-	startMListener(&wsClients)
+	startMultiEventSource(&wsClients)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
@@ -49,7 +49,7 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 	r.GET("/ws", wsEndpoint)
 }
 
-func startMListener(wsClients *sync.Map) {
+func startMultiEventSource(wsClients *sync.Map) {
 	ml := meventsource.New()
 
 	ml.Add(&eventsource.NATS{
