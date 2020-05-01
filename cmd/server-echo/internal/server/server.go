@@ -5,7 +5,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"go-eventhub/cmd/server-echo/internal/listeners"
 	"go-eventhub/cmd/server-echo/internal/mlistener"
-	"go-eventhub/cmd/server-echo/internal/target"
+	"go-eventhub/cmd/server-echo/internal/pushers"
 	"sync"
 )
 
@@ -53,7 +53,7 @@ func startMListener(wsClients *sync.Map) {
 	ml := mlistener.New()
 
 	ml.Add(&listeners.NATSListener{
-		Targets: []target.Target{&target.WebSocket{WSClients: wsClients}, &target.Kafka{}},
+		Targets: []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
 	})
 
 	ml.Start()

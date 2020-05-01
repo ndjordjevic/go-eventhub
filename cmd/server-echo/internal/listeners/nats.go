@@ -2,14 +2,14 @@ package listeners
 
 import (
 	"github.com/nats-io/nats.go"
-	"go-eventhub/cmd/server-echo/internal/target"
+	"go-eventhub/cmd/server-echo/internal/pushers"
 	"log"
 	"strings"
 	"time"
 )
 
 type NATSListener struct {
-	Targets []target.Target
+	Targets []pushers.EventPusher
 }
 
 func (n *NATSListener) Listen() {

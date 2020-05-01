@@ -1,4 +1,4 @@
-package target
+package pushers
 
 import (
 	"github.com/gorilla/websocket"
