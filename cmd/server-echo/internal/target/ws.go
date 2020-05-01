@@ -6,11 +6,11 @@ import (
 	"sync"
 )
 
-type WebSocketTarget struct {
+type WebSocket struct {
 	WSClients *sync.Map
 }
 
-func (w WebSocketTarget) Push(msg []string) {
+func (w WebSocket) Push(msg []string) {
 	client, ok := w.WSClients.Load(msg[0])
 	if ok {
 		log.Printf("Forwarding to ws: %v", msg)

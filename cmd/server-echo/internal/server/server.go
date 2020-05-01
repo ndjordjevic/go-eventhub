@@ -54,7 +54,7 @@ func startMListener(wsClients *sync.Map) {
 	ml := mlistener.New()
 
 	ml.Add(&listeners.NATSListener{
-		Targets: []target.Target{&target.WebSocketTarget{WSClients: wsClients}, &target.KafkaTarget{}},
+		Targets: []target.Target{&target.WebSocket{WSClients: wsClients}, &target.Kafka{}},
 	})
 
 	ml.Start()

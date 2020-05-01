@@ -1,8 +1,8 @@
 package target
 
-type KafkaTarget struct {
+type Kafka struct {
 }
 
-func (k KafkaTarget) Push(msg []string) {
+func (k Kafka) Push(msg []string) {
 	//panic("implement me")
 }
