@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"go-eventhub/cmd/server-echo/internal/eventsource"
-	"go-eventhub/cmd/server-echo/internal/listeners"
 	"go-eventhub/cmd/server-echo/internal/mlistener"
 	"go-eventhub/cmd/server-echo/internal/pushers"
 	"sync"
