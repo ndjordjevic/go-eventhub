@@ -34,7 +34,7 @@ func (n *NATSListener) Listen() {
 
 		parsed := strings.Split(string(msg.Data), ",")
 
-		for _, t := range n.targets {
+		for _, t := range n.Targets {
 			t.Push(parsed)
 		}
 	}
