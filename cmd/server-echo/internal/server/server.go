@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go-eventhub/cmd/server-echo/internal/eventsource"
+	"go-eventhub/cmd/server-echo/internal/listeners"
 	"go-eventhub/cmd/server-echo/internal/meventsource"
 	"go-eventhub/cmd/server-echo/internal/pushers"
 	"sync"
@@ -50,9 +50,9 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 }
 
 func startMultiEventSource(wsClients *sync.Map) {
-	ml := meventsource.New()
+	ml := listeners.NewMultiple()
 
-	ml.Add(&eventsource.NATS{
+	ml.Add(&listeners.NATS{
 		Targets: []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
 	})
 

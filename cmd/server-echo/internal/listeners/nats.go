@@ -1,4 +1,4 @@
-package eventsource
+package listeners
 
 import (
 	"github.com/nats-io/nats.go"
