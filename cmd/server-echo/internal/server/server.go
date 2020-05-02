@@ -3,9 +3,8 @@ package server
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"go-eventhub/cmd/server-echo/internal/listeners"
-	"go-eventhub/cmd/server-echo/internal/meventsource"
-	"go-eventhub/cmd/server-echo/internal/pushers"
+	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/listeners"
+	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
 	"sync"
 )
 

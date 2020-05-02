@@ -2,7 +2,7 @@ package listeners
 
 import (
 	"github.com/nats-io/nats.go"
-	"go-eventhub/cmd/server-echo/internal/pushers"
+	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
 	"log"
 	"strings"
 	"time"
