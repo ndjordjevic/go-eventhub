@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-eventhub/cmd/server-echo/internal/server"
+	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/server"
 )
 
 func main() {
