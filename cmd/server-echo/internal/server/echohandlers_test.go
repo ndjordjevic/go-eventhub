@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -26,7 +27,6 @@ func Test_login_successful(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	// Assertions
 	if assert.NoError(t, login(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
@@ -47,7 +47,14 @@ func Test_login_failed(t *testing.T) {
 	assert.EqualError(t, login(c), "code=401, message=Unauthorized")
 }
 
-func Test_wsEndpoint_successful(t *testing.T) {
+type WsHandler struct {
+	handler echo.HandlerFunc
+}
+
+func (h *WsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	e := echo.New()
+	c := e.NewContext(r, w)
+
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := token.Claims.(jwt.MapClaims)
@@ -59,7 +66,6 @@ func Test_wsEndpoint_successful(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(ts)
 
 	to, err := jwt.Parse(ts, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -68,31 +74,22 @@ func Test_wsEndpoint_successful(t *testing.T) {
 		return []byte("secret"), nil
 	})
 
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/restricted/ws", nil)
-	req.Header["Accept-Encoding"] = []string{"gzip", "deflate", "br"}
-
-	req.Header.Set("Authorization", "Bearer "+ts)
-	req.Header.Set("Connection", "upgrade")
-	req.Header.Set("Upgrade", "websocket")
-	req.Header.Set("Sec-WebSocket-Version", "13")
-	req.Header.Set("Sec-WebSocket-Key", "ABDUNUXB9lg3+tpYnQRRtQ==")
-
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
 	c.Set("user", to)
 
 	var wsClients sync.Map
 	cc := &CustomContext{c, &wsClients}
 
-	//if assert.NoError(t, wsEndpoint(cc)) {
-	//	assert.Equal(t, http.StatusOK, rec.Code)
-	//}
+	forever := make(chan struct{})
+	h.handler(cc)
+	<-forever
+}
 
-	err = wsEndpoint(cc)
-	fmt.Println(err)
+func Test_wsEndpoint_successful(t *testing.T) {
+	h := WsHandler{handler: wsEndpoint}
+	server := httptest.NewServer(http.HandlerFunc(h.ServeHTTP))
+	defer server.Close()
+
+	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/restricted/ws"
+	_, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	assert.Nil(t, err, err)
 }
