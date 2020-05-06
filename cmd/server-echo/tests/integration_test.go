@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"sync"
 	"testing"
 )
 
@@ -19,15 +18,12 @@ const (
 	user string = "ndjordjevic"
 )
 
-func TestIntegration(t *testing.T) {
-	var wg sync.WaitGroup
-	wg.Add(1)
+var ready = make(chan interface{})
 
-	go wsListener(t, &wg)
+func TestIntegration(t *testing.T) {
+	go wsListener(t)
 
 	sendToNats()
-
-	wg.Wait()
 }
 
 func sendToNats() {
@@ -42,6 +38,7 @@ func sendToNats() {
 
 	subj, msg := "sb-events", []byte("ndjordjevic,new_order")
 
+	<-ready
 	_ = nc.Publish(subj, msg)
 
 	_ = nc.Flush()
@@ -53,9 +50,7 @@ func sendToNats() {
 	}
 }
 
-func wsListener(t *testing.T, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func wsListener(t *testing.T) {
 	formData := url.Values{
 		"username": {user},
 		"password": {"test"},
@@ -92,6 +87,7 @@ func wsListener(t *testing.T, wg *sync.WaitGroup) {
 		defer close(done)
 		for {
 			fmt.Println("Listen ws")
+			ready <- nil
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				log.Println("read:", err)
@@ -123,11 +119,6 @@ func wsListener(t *testing.T, wg *sync.WaitGroup) {
 				log.Println("write close:", err)
 				return
 			}
-			//select {
-			//case <-done:
-			//case <-time.After(time.Second):
-			//}
-			wg.Done()
 			return
 		}
 	}

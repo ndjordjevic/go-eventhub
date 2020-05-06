@@ -26,6 +26,9 @@ func main() {
 	}
 
 	r, err := http.PostForm("http://localhost:8080/login", formData)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var result map[string]interface{}
 	_ = json.NewDecoder(r.Body).Decode(&result)
 

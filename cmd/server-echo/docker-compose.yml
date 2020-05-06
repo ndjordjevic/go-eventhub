@@ -1,0 +1,28 @@
+version: '3'
+
+networks:
+  event-hub-net:
+    driver: bridge
+
+services:
+  event-hub:
+    build:
+      context: ../../
+      dockerfile: cmd/server-echo/Dockerfile
+    container_name: event-hub
+    depends_on:
+      - nats
+    networks:
+      - event-hub-net
+    ports:
+      - "8080:8080"
+  nats:
+    image: nats:latest
+    container_name: nats
+    ports:
+      - "4222:4222"
+    expose:
+      - "4222"
+    restart: on-failure
+    networks:
+      - event-hub-net

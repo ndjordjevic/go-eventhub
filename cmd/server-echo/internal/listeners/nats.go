@@ -13,7 +13,7 @@ type NATS struct {
 }
 
 func (n *NATS) Listen() {
-	nc, err := nats.Connect("localhost")
+	nc, err := nats.Connect("nats")
 	if err != nil {
 		log.Fatal(err)
 	}
