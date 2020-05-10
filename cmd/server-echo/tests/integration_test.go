@@ -8,8 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"os/signal"
+	"sync"
 	"testing"
 )
 
@@ -21,9 +20,14 @@ const (
 var ready = make(chan interface{})
 
 func TestIntegration(t *testing.T) {
-	go wsListener(t)
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go wsListener(t, &wg)
 
 	sendToNats()
+
+	wg.Wait()
 }
 
 func sendToNats() {
@@ -50,7 +54,7 @@ func sendToNats() {
 	}
 }
 
-func wsListener(t *testing.T) {
+func wsListener(t *testing.T, wg *sync.WaitGroup) {
 	formData := url.Values{
 		"username": {user},
 		"password": {"test"},
@@ -64,9 +68,6 @@ func wsListener(t *testing.T) {
 	if ok == false {
 		log.Fatal("User is not authorized to connect to ws")
 	}
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
 
 	u := url.URL{Scheme: "ws", Host: "localhost:8080", Path: "/restricted/ws"}
 	log.Printf("connecting to %s", u.String())
@@ -94,10 +95,10 @@ func wsListener(t *testing.T) {
 				return
 			}
 			log.Printf("recv: %s", message)
-			if string(message) == "new_order" {
-				t.Log("Successful")
-				return
+			if string(message) != "new_order" {
+				t.Error("No right msg")
 			}
+			wg.Done()
 		}
 	}()
 
@@ -107,17 +108,6 @@ func wsListener(t *testing.T) {
 			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				log.Println("write close:", err)
-			}
-			return
-		case <-interrupt:
-			log.Println("interrupt")
-
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Println("write close:", err)
-				return
 			}
 			return
 		}

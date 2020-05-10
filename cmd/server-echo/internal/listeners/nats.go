@@ -4,6 +4,7 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -12,8 +13,11 @@ type NATS struct {
 	Targets []pushers.EventPusher
 }
 
+var natsAddr = os.Getenv("NATS_ADDR")
+
 func (n *NATS) Listen() {
-	nc, err := nats.Connect("nats")
+	log.Println("Connecting to NATS on:", natsAddr)
+	nc, err := nats.Connect(natsAddr)
 	if err != nil {
 		log.Fatal(err)
 	}

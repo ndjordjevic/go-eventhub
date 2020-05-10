@@ -1,5 +1,5 @@
 up:
-	docker-compose -f cmd/server-echo/docker-compose.yml up -d
+	docker-compose -f cmd/server-echo/docker-compose.yml up
 
 down:
 	docker-compose -f cmd/server-echo/docker-compose.yml down

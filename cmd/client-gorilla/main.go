@@ -25,7 +25,7 @@ func main() {
 		"password": {"test"},
 	}
 
-	r, err := http.PostForm("http://localhost:8080/login", formData)
+	r, err := http.PostForm("http://"+*addr+"/login", formData)
 	if err != nil {
 		log.Fatal(err)
 	}
