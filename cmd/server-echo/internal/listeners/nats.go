@@ -36,6 +36,8 @@ func (n *NATS) Listen() {
 			continue
 		}
 
+		log.Println("Msg received:", string(msg.Data))
+
 		parsed := strings.Split(string(msg.Data), ",")
 
 		for _, t := range n.Targets {

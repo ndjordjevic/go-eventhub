@@ -50,7 +50,7 @@ func wsEndpoint(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	name := claims["name"].(string)
-	c.Logger().Print("User logged in: ", name)
+	c.Logger().Print("Connected to websocket as: ", name)
 
 	cc := c.(*CustomContext)
 	wsClients := cc.wsClients
