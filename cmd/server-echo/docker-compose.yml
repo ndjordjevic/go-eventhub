@@ -16,6 +16,9 @@ services:
       - event-hub-net
     ports:
       - "8080:8080"
+    environment:
+      - NATS_ADDR=nats
+
   nats:
     image: nats:latest
     container_name: nats
