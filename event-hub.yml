@@ -1,0 +1,65 @@
+version: "3.3"
+
+services:
+  web-server:
+    image: ndjordjevic/server-echo:latest
+    networks:
+      - traefik
+    environment:
+      - NATS_ADDR=nats
+    deploy:
+      mode: replicated
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+      labels:
+        - "traefik.http.routers.event-hub.rule=Host(`node1.nordea.com`)"
+        - "traefik.http.routers.event-hub.service=event-hub"
+        - "traefik.http.services.event-hub.loadbalancer.server.port=8080"
+        - "traefik.docker.network=event-hub_traefik"
+  nats:
+    image: nats:latest
+    networks:
+      - traefik
+    deploy:
+      labels:
+        - "traefik.tcp.routers.nats.entrypoints=natsep"
+        - "traefik.tcp.routers.nats.rule=HostSNI(`*`)"
+        - "traefik.tcp.routers.nats.service=nats"
+        - "traefik.tcp.services.nats.loadbalancer.server.port=4222"
+        - "traefik.docker.network=event-hub_traefik"
+  traefik:
+    image: traefik:latest
+    ports:
+      - "80:80"
+      - "8080:8080"
+      - "443:443"
+      - "4222:4222"
+    command:
+      - --accesslog=true
+      - --api.insecure=true # set to 'false' on production
+      - --api.dashboard=true # see https://docs.traefik.io/v2.0/operations/dashboard/#secure-mode for how to secure the dashboard
+      - --api.debug=true # enable additional endpoints for debugging and profiling
+      - --log.level=INFO # debug while we get it working, for more levels/info see https://docs.traefik.io/observability/logs/
+      - --providers.docker=true
+      - --providers.docker.swarmMode=true
+      - --providers.docker.exposedbydefault=true
+      - --providers.docker.network=event-hub_traefik
+      - --entrypoints.web.address=:80
+      - --entrypoints.web-secured.address=:443
+      - --entrypoints.natsep.address=:4222
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik
+    deploy:
+      placement:
+        constraints: [node.role==manager]
+    #      labels:
+    #        - "traefik.enable=true"
+    #        - "traefik.http.routers.api.rule=Host(`traefik.yourdomain.com`)"
+    #        - "traefik.http.routers.api.service=api@internal" # Let the dashboard access the traefik api
+networks:
+  traefik:
+    driver: overlay

@@ -64,6 +64,10 @@ func main() {
 				return
 			}
 			log.Printf("recv: %s", message)
+			log.Printf("Echoing the same msg back to server: %s", message)
+			if err := c.WriteMessage(websocket.TextMessage, message); err != nil {
+				return
+			}
 		}
 	}()
 
