@@ -29,4 +29,6 @@ docker stack rm event-hub
 
 sudo netstat -tulpn | grep LISTEN
 
+go tool pprof http://localhost:8080/debug/pprof/profile\?seconds\=30
+
 
