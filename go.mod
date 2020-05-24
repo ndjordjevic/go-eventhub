@@ -11,6 +11,7 @@ require (
 	github.com/gofiber/fiber v1.9.2
 	github.com/gofiber/jwt v0.0.6
 	github.com/gofiber/websocket v0.2.0
+	github.com/golang/protobuf v1.4.0
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/imkira/go-interpol v1.1.0 // indirect
@@ -37,4 +38,5 @@ require (
 	github.com/yudai/pp v2.0.1+incompatible // indirect
 	golang.org/x/net v0.0.0-20200421231249-e086a090c8fd // indirect
 	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
+	google.golang.org/protobuf v1.23.0
 )

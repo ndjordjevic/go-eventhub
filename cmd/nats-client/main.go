@@ -2,10 +2,12 @@ package main
 
 import (
 	"flag"
+	"google.golang.org/protobuf/proto"
 	"log"
 	"os"
 
 	"github.com/nats-io/nats.go"
+	"github.com/ndjordjevic/go-eventhub/internal/protogen/api"
 )
 
 // NOTE: Can test with demo servers.
@@ -13,7 +15,7 @@ import (
 // nats-pub -s demo.nats.io:4443 <subject> <msg> (TLS version)
 
 func usage() {
-	log.Printf("Usage: nats-pub [-s server] [-creds file] <subject> <msg>\n")
+	log.Printf("Usage: nats-pub [-s server] [-creds file] <subject>\n")
 	flag.PrintDefaults()
 }
 
@@ -37,7 +39,7 @@ func main() {
 	}
 
 	args := flag.Args()
-	if len(args) != 2 {
+	if len(args) != 1 {
 		showUsageAndExit(1)
 	}
 
@@ -56,7 +58,23 @@ func main() {
 	}
 	defer nc.Close()
 
-	subj, msg := args[0], []byte(args[1])
+	i := &api.Instrument{
+		User:        "ndjordjevic",
+		MessageType: api.Instrument_UPDATE,
+		InstrumentPayload: []*api.Instrument_Payload{
+			{
+				Id:   1,
+				Isin: "BMW1",
+			},
+		},
+	}
+
+	msg, err := proto.Marshal(i)
+	if err != nil {
+		log.Fatalln("Failed to encode instrument:", err)
+	}
+
+	subj := args[0]
 
 	if reply != nil && *reply != "" {
 		nc.PublishRequest(subj, *reply, msg)
@@ -69,6 +87,6 @@ func main() {
 	if err := nc.LastError(); err != nil {
 		log.Fatal(err)
 	} else {
-		log.Printf("Published [%s] : '%s'\n", subj, msg)
+		log.Printf("Published [%s] : '%v'\n", subj, i)
 	}
 }

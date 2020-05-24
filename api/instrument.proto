@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package api;
+
+option go_package = "github.com/ndjordjevic/go-eventhub/internal/protogen/api";
+
+message Instrument {
+    enum Type {
+        NEW = 0;
+        UPDATE = 1;
+        DELETE = 2;
+    }
+
+    message Payload {
+        int32 id = 1;
+        string isin = 2;
+    }
+
+    string user = 1;
+    Type messageType = 2;
+    repeated Payload instrumentPayload = 3;
+}

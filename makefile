@@ -6,3 +6,6 @@ down:
 
 build:
 	docker build -t ndjordjevic/server-echo -f cmd/server-echo/Dockerfile .
+
+proto:
+	protoc --proto_path=api --go_out=./internal/protogen/api --go_opt=paths=source_relative ./api/instrument.proto
