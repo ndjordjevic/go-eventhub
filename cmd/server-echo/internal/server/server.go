@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/listeners"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
+	"net/http"
 	"sync"
 )
 
@@ -35,6 +36,8 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 			return next(cc)
 		}
 	})
+
+	e.GET("/debug/pprof/*", echo.WrapHandler(http.DefaultServeMux))
 
 	// Login route
 	e.POST("/login", login)
