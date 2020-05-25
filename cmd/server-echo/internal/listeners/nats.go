@@ -1,11 +1,9 @@
 package listeners
 
 import (
-	"fmt"
 	"github.com/nats-io/nats.go"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
 	"github.com/ndjordjevic/go-eventhub/internal/protogen/api"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 	"log"
 	"os"
@@ -13,7 +11,7 @@ import (
 )
 
 type NATS struct {
-	Targets []pushers.EventPusher
+	Pushers []pushers.EventPusher
 }
 
 var natsAddr = os.Getenv("NATS_ADDR")
@@ -44,13 +42,10 @@ func (n *NATS) Listen() {
 			log.Fatalln("Failed to parse instrument:", err)
 		}
 
-		log.Printf("Msg received user: %v", instrument)
+		log.Printf("Msg received from nats, user: %v", instrument)
 
-		json, err := protojson.Marshal(instrument)
-		fmt.Printf("%v\n", string(json))
-
-		//for _, t := range n.Targets {
-		//	t.Push(instrument)
-		//}
+		for _, p := range n.Pushers {
+			p.Push(instrument)
+		}
 	}
 }

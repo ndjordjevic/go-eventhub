@@ -71,6 +71,6 @@ func wsEndpoint(c echo.Context) error {
 			wsClients.Delete(name)
 			return nil
 		}
-		fmt.Printf("%s\n", msg)
+		fmt.Printf("Message received from ws: %s\n", msg)
 	}
 }
