@@ -31,4 +31,13 @@ sudo netstat -tulpn | grep LISTEN
 
 go tool pprof http://localhost:8080/debug/pprof/profile\?seconds\=30
 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.1/aio/deploy/recommended.yaml
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | awk '/^deployment-controller-token-/{print $1}') | awk '$1=="token:"{print $2}'
+kubectl proxy (start dashboard for docker desktop)
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/login (url to docker desktop)
 
+kubectl create -f deployments/nats-deployment.yaml
+kubectl apply -f deployments/nats-deployment.yaml
+kubectl logs nats-deployment-864cbddb96-stkqg
+
+kubectl create -f deployments/nats-service.yaml

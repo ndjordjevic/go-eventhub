@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"google.golang.org/protobuf/proto"
 	"log"
 	"os"
@@ -40,6 +41,7 @@ func main() {
 
 	args := flag.Args()
 	if len(args) != 1 {
+		fmt.Println("args != 1")
 		showUsageAndExit(1)
 	}
 

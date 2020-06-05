@@ -55,7 +55,8 @@ func startMultiEventListener(wsClients *sync.Map) {
 	ml := listeners.NewMultiple()
 
 	ml.Add(&listeners.NATS{
-		Pushers: []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
+		Pushers:  []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
+		Subjects: []string{"instrument", "order"},
 	})
 
 	ml.Start()

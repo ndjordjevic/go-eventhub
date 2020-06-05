@@ -11,7 +11,8 @@ import (
 )
 
 type NATS struct {
-	Pushers []pushers.EventPusher
+	Pushers  []pushers.EventPusher
+	Subjects []string
 }
 
 var natsAddr = os.Getenv("NATS_ADDR")

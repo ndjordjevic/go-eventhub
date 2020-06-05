@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eventhub-deployment
+  labels:
+    app: eventhub
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eventhub
+  template:
+    metadata:
+      labels:
+        app: eventhub
+    spec:
+      containers:
+        - name: eventhub
+          image: ndjordjevic/server-echo:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NATS_ADDR
+              value: nats-service
