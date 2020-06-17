@@ -39,5 +39,9 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 kubectl create -f deployments/nats-deployment.yaml
 kubectl apply -f deployments/nats-deployment.yaml
 kubectl logs nats-deployment-864cbddb96-stkqg
-
 kubectl create -f deployments/nats-service.yaml
+
+docker network create app-tier --driver bridge
+docker run -d --name etcd-server --network app-tier --publish 2379:2379 --publish 2380:2380 --env ALLOW_NONE_AUTHENTICATION=yes --env ETCD_ADVERTISE_CLIENT_URLS=http://etcd-server:2379 bitnami/etcd:latest
+docker run -it --rm --network app-tier --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd:latest etcdctl --endpoints http://etcd-server:2379 put /message Hello
+docker run -it --rm --network app-tier --env ALLOW_NONE_AUTHENTICATION=yes bitnami/etcd:latest etcdctl --endpoints http://etcd-server:2379 get /message

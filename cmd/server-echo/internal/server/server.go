@@ -1,12 +1,16 @@
 package server
 
 import (
+	"context"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/listeners"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
+	"go.etcd.io/etcd/clientv3"
+	"log"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type CustomContext struct {
@@ -15,12 +19,21 @@ type CustomContext struct {
 }
 
 func Run() {
+	etcd, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{"http://localhost:2379"},
+		DialTimeout: 2 * time.Second,
+	})
+
+	if err == context.DeadlineExceeded {
+		log.Fatal(err)
+	}
+
 	e := echo.New()
 
 	var wsClients sync.Map
 	setupEchoServer(e, &wsClients)
 
-	startMultiEventListener(&wsClients)
+	startMultiEventListener(&wsClients, etcd)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
@@ -51,12 +64,13 @@ func setupEchoServer(e *echo.Echo, wsClients *sync.Map) {
 	r.GET("/ws", wsEndpoint)
 }
 
-func startMultiEventListener(wsClients *sync.Map) {
+func startMultiEventListener(wsClients *sync.Map, etcd *clientv3.Client) {
 	ml := listeners.NewMultiple()
 
 	ml.Add(&listeners.NATS{
 		Pushers:  []pushers.EventPusher{&pushers.WebSocket{WSClients: wsClients}, &pushers.Kafka{}},
 		Subjects: []string{"instrument", "order"},
+		Config:   etcd,
 	})
 
 	ml.Start()

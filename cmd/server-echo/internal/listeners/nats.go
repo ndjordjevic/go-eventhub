@@ -1,23 +1,33 @@
 package listeners
 
 import (
+	"context"
 	"github.com/nats-io/nats.go"
 	"github.com/ndjordjevic/go-eventhub/cmd/server-echo/internal/pushers"
 	"github.com/ndjordjevic/go-eventhub/internal/protogen/api"
+	"go.etcd.io/etcd/clientv3"
 	"google.golang.org/protobuf/proto"
 	"log"
-	"os"
 	"time"
 )
 
 type NATS struct {
 	Pushers  []pushers.EventPusher
 	Subjects []string
+	Config   *clientv3.Client
 }
 
-var natsAddr = os.Getenv("NATS_ADDR")
+//var natsAddr = os.Getenv("NATS_ADDR")
 
 func (n *NATS) Listen() {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	natsAddrValue, err := n.Config.Get(ctx, "/natsAddr")
+	cancel()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	natsAddr := string(natsAddrValue.Kvs[0].Value)
 	log.Println("Connecting to NATS on:", natsAddr)
 	nc, err := nats.Connect(natsAddr)
 	if err != nil {
